@@ -3,5 +3,5 @@ from . import views
 
 urlpatterns = [
     url(r'^$', (views.index)),
-    url(r'^refineSearch',(views.refineSearch)),
+    url(r'^refineSearch$',(views.refineSearch)),
 ]
