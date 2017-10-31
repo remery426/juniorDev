@@ -4,11 +4,14 @@ from .indeedScript import parseIndeed
 def index(request):
     return render(request,"index.html")
 def refineSearch(request):
-    myUrl = request.POST['url']
-    myResults= parseIndeed(myUrl)
-    context = {
-        'results': myResults[0],
-        'original': myResults[1],
-        'new': myResults[2]
-    }
-    return render(request,'results.html', context)
+    myUrl  = request.POST['url']
+    response = parseIndeed(myUrl)
+    if response['error_message']:
+        return redirect('/')
+    else:
+        context = {
+            'results': response['results'],
+            'original': response['original'],
+            'new': response['newLen']
+        }
+        return render(request,'results.html', context)

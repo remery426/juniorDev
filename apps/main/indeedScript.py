@@ -23,41 +23,55 @@ def get_totalPages(str1):
 
 
 def parseIndeed(id):
+    if (id[len(id)-9:len(id)-2])== "&start=":
+        id = id[:len(id)-9]
     response = {}
-    r = requests.get(id)
-    c = r.content
-    soup = BS4(c,"html.parser")
-    find_total = soup.find('div',{"id":"searchCount"}).text
-    iterations = get_totalPages(find_total)
-    bad_words = ["mentor", "mentoring", "Mentor","Mentoring","Guiding more junior peers","couch junior","guide junior","help junior", "teach junior", "assist junior"]
-    junior_dict ={}
-    add_count = 0
-    page_var = ""
-    count = 0
-
-    while add_count * 15 <= iterations:
-        if add_count>0:
-            num_holder = 10 * add_count
-            page_var = "&start=" + str(num_holder)
-        r = requests.get(str(id)+page_var)
+    if len(id) == 0:
+        response['error_message'] = "Invalid URL"
+        return response
+    response['error_message'] = None
+    try:
+        r = requests.get(id)
+    except:
+        response['error_message'] = "Invalid URL"
+        return response
+    if r:
         c = r.content
+        soup = BS4(c,"html.parser")
+        find_total = soup.find('div',{"id":"searchCount"}).text
+        iterations = get_totalPages(find_total)
+        bad_words = ["mentor", "mentoring", "Mentor","Mentoring","Guiding more junior peers","couch junior","guide junior","help junior", "teach junior", "assist junior"]
+        junior_dict ={}
+        add_count = 0
+        page_var = ""
+        count = 0
 
-        soup = BS4(c ,"html.parser")
-        a_list = []
-        b_list = []
-        for i, j in zip(soup.find_all("a",{"data-tn-element":"jobTitle"}),soup.find_all("span",{'class':'company'})):
-            if i != None and "senior" not in i.text.lower() and "sr." not in i.text.lower() and "lead" not in i.text.lower() and "principal" not in i.text.lower() and "Sr" not in i.text:
-                count+=1
-                a_list.append(i)
-                b_list.append(j.text)
-        for x, y, z in zip(soup.find_all("span",{"class":"summary"}),a_list,b_list):
+        while add_count * 15 <= iterations:
+            if add_count>0:
+                num_holder = 10 * add_count
+                page_var = "&start=" + str(num_holder)
+            r = requests.get(str(id)+page_var)
+            c = r.content
 
-            was_bad = False
-            for b in bad_words:
-                if b in x.text:
-                    was_bad = True
-            if was_bad == False:
-                junior_dict[y.text]= [y["href"], z]
+            soup = BS4(c ,"html.parser")
+            a_list = []
+            b_list = []
+            for i, j in zip(soup.find_all("a",{"data-tn-element":"jobTitle"}),soup.find_all("span",{'class':'company'})):
+                if i != None and "senior" not in i.text.lower() and "sr." not in i.text.lower() and "lead" not in i.text.lower() and "principal" not in i.text.lower() and "Sr" not in i.text:
+                    count+=1
+                    a_list.append(i)
+                    b_list.append(j.text)
+            for x, y, z in zip(soup.find_all("span",{"class":"summary"}),a_list,b_list):
+                print(count)
+                was_bad = False
+                for b in bad_words:
+                    if b in x.text:
+                        was_bad = True
+                if was_bad == False:
+                    junior_dict[y.text]= [y["href"], z]
 
-        add_count+=1
-    return [junior_dict,iterations,len(junior_dict)]
+            add_count+=1
+            response['results'] = junior_dict
+            response['original'] = iterations
+            response['newLen'] = len(junior_dict)
+        return response
