@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Junior Dev Finder</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <div class="page-header">
+        <h1> Find Junior Roles </h1>
+      </div>
+      <p> Search for the junior role you want on indeed and then paste the url of the indeed search results into the form below.  Your results should have a much higher concentration of roles that are actually junior </p>
+      <form class="" action="/refineSearch" method="post">
+        {% csrf_token %}
+        <input type="text" name="url" value="">
+        <input type="submit" name="" value="submit">
+      </form>
+      (Depending on the size of search results, this could take awhile)
+    </div>
+  </body>
+</html>
